@@ -1,29 +1,32 @@
 class GitCurlOpenssl < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  url "https://www.kernel.org/pub/software/scm/git/git-2.24.1.tar.xz"
-  sha256 "723f24dce8fdd621a308b6187553fce7d5244205c065fe0a3aebd0b7c3f88562"
+  url "https://www.kernel.org/pub/software/scm/git/git-2.27.0.tar.xz"
+  sha256 "73ca9774d7fa226e1d87c1909401623f96dca6a044e583b9a762e84d7d1a73f9"
   head "https://github.com/git/git.git", :shallow => false
 
   bottle do
-    sha256 "2779f9cea861ef4d906093ac7b7255b3eeb7b6f76cbbc8407035bd3d3b80305d" => :catalina
-    sha256 "423599ea4d93020e4ee33965bf53c0e629c1d5a16e59efc657b4c914d9f52bd0" => :mojave
-    sha256 "ce56a6b4012a93bfee18cc5017788033c423bef5f732f3117dfa59b688b08b5c" => :high_sierra
+    sha256 "5bfe46796926e48d2d78ee87e93195c0a36f7c70d9aa4ff8ab77277a6582441a" => :catalina
+    sha256 "dffad4b938672dda3aef783f88cf38d67923f8f8e68df77b198476816fd37d4f" => :mojave
+    sha256 "c9f1d9ac100e43a2e6f1df9785d98119d08bf144d862fb541c1212ccfb700041" => :high_sierra
   end
 
   depends_on "gettext"
   depends_on "pcre2"
-  depends_on "openssl@1.1"
-  depends_on "curl-openssl"
+
+  if MacOS.version < :yosemite
+    depends_on "openssl@1.1"
+    depends_on "curl"
+  end
 
   resource "html" do
-    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.24.1.tar.xz"
-    sha256 "8b4da79e7931c5156f3f994c6d8162c7ccb525ebd3f71e26ae8f8430db038403"
+    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.27.0.tar.xz"
+    sha256 "ffa91681b6a8f558745924b1dbb76d604c9e52b27c525c6bd470c0123f7f4af3"
   end
 
   resource "man" do
-    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.24.1.tar.xz"
-    sha256 "27304ab2674d5ad623a0a72c22116cb47df4a611499a53aef5c7ec39a32cfefb"
+    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.27.0.tar.xz"
+    sha256 "e6cbab49b04c975886fdddf46eb24c5645c6799224208db8b01143091d9bd49c"
   end
 
   resource "Net::SMTP::SSL" do
@@ -64,14 +67,19 @@ class GitCurlOpenssl < Formula
       ENV["HOMEBREW_SDKROOT"] = MacOS::CLT.sdk_path(MacOS.version)
     end
 
+# The git-gui and gitk tools are installed by a separate formula (git-gui)
+    # to avoid a dependency on tcl-tk and to avoid using the broken system
+    # tcl-tk (see https://github.com/Homebrew/homebrew-core/issues/36390)
+    # This is done by setting the NO_TCLTK make variable.
     args = %W[
       prefix=#{prefix}
       sysconfdir=#{etc}
       CC=#{ENV.cc}
       CFLAGS=#{ENV.cflags}
       LDFLAGS=#{ENV.ldflags}
+      NO_TCLTK=1
     ]
-
+    
     openssl_prefix = Formula["openssl@1.1"].opt_prefix
     args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
 
