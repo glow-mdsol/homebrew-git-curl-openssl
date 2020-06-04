@@ -81,8 +81,13 @@ class GitCurlOpenssl < Formula
     ]
 
     openssl_prefix = Formula["openssl@1.1"].opt_prefix
-    curl_prefix = Formula["curl"].opt_prefix
-    args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix} CURLDIR=#{curl_prefix}]
+    curl_prefix = Formula["curl-openssl"].opt_prefix
+    args += %W[
+      NO_APPLE_COMMON_CRYPTO=1 
+      OPENSSLDIR=#{openssl_prefix} 
+      CURLDIR=#{curl_prefix} 
+      CURL_CONFIG=#{curl_prefix}/bin/curl-config
+    ]
 
     system "make", "install", *args
 
