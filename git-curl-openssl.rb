@@ -79,9 +79,10 @@ class GitCurlOpenssl < Formula
       LDFLAGS=#{ENV.ldflags}
       NO_TCLTK=1
     ]
-    
+
     openssl_prefix = Formula["openssl@1.1"].opt_prefix
-    args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
+    curl_prefix = Formula["curl"].opt_prefix
+    args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix} CURLDIR=#{curl_prefix}]
 
     system "make", "install", *args
 
